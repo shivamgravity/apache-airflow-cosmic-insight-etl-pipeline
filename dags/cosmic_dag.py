@@ -14,10 +14,20 @@ def cosmic_insight_pipeline():
 
     @task
     def extract_neo_data():
-        # Using NASA's demo key for the POC
-        url = "https://api.nasa.gov/neo/rest/v1/feed?start_date=2026-01-30&api_key=DEMO_KEY"
-        response = requests.get(url).json()
-        return response['near_earth_objects']
+        import requests
+        # Using a dynamic date to ensure we always have data for "today"
+        today = datetime.now().strftime('%Y-%m-%d')
+        url = f"https://api.nasa.gov/neo/rest/v1/feed?start_date={today}&api_key=DEMO_KEY"
+        
+        response = requests.get(url)
+        data = response.json()
+        
+        # Check if the key exists before accessing it
+        if 'near_earth_objects' not in data:
+            error_msg = data.get('error_message', 'Unknown API Error')
+            raise ValueError(f"NASA API Error: {error_msg}")
+            
+        return data['near_earth_objects']
 
     @task
     def transform_data(raw_data):
