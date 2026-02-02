@@ -1,9 +1,11 @@
 from airflow.decorators import dag, task
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from datetime import datetime
-import requests
 import pandas as pd
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 @dag(
     start_date=datetime(2026, 1, 1),
@@ -18,7 +20,7 @@ def cosmic_insight_pipeline():
         import requests
         # Using a dynamic date to ensure we always have data for "today"
         today = datetime.now().strftime('%Y-%m-%d')
-        url = f"https://api.nasa.gov/neo/rest/v1/feed?start_date={today}&api_key=DEMO_KEY"
+        url = f"https://api.nasa.gov/neo/rest/v1/feed?start_date={today}&api_key={os.getenv('NASA_API_KEY','DEMO_KEY')}"
         
         response = requests.get(url)
         data = response.json()
