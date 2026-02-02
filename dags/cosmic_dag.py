@@ -1,4 +1,5 @@
 from airflow.decorators import dag, task
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 from datetime import datetime
 import requests
 import pandas as pd
@@ -34,9 +35,16 @@ def cosmic_insight_pipeline():
 
     @task
     def load_to_postgres(json_data):
+        import pandas as pd
         df = pd.read_json(json_data)
-        # In a real setup, use PostgresHook here
-        print(f"Loading {len(df)} asteroids into the warehouse...")
+        
+        # Establish connection to the Postgres container
+        pg_hook = PostgresHook(postgres_conn_id='postgres_default')
+        engine = pg_hook.get_sqlalchemy_engine()
+        
+        # Load data into the 'asteroids' table
+        df.to_sql('asteroids', engine, if_exists='append', index=False)
+        print(f"Successfully loaded {len(df)} records.")
 
     # Define dependencies
     raw = extract_neo_data()
