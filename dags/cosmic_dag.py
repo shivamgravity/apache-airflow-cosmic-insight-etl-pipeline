@@ -46,15 +46,20 @@ def cosmic_insight_pipeline():
     @task
     def load_to_postgres(json_data):
         import pandas as pd
+        from airflow.providers.postgres.hooks.postgres import PostgresHook
+        
+        # 1. Convert the JSON back to a DataFrame
         df = pd.read_json(json_data)
         
-        # Establish connection to the Postgres container
+        # 2. Use the PostgresHook to get the connection we just saved in the UI
         pg_hook = PostgresHook(postgres_conn_id='postgres_default')
         engine = pg_hook.get_sqlalchemy_engine()
         
-        # Load data into the 'asteroids' table
-        df.to_sql('asteroids', engine, if_exists='append', index=False)
-        print(f"Successfully loaded {len(df)} records.")
+        # 3. Use 'replace' to ensure the DAG never fails on duplicate IDs
+        # This is perfect for a POC demo to ensure a smooth video recording.
+        df.to_sql('asteroids', engine, if_exists='replace', index=False)
+        
+        print(f"Successfully loaded {len(df)} records into the Gold Layer.")
 
     # Define dependencies
     raw = extract_neo_data()
