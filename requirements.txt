@@ -1,3 +1,6 @@
 apache-airflow-providers-postgres
 pandas
 requests
+streamlit
+sqlalchemy
+psycopg2-binary
