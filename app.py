@@ -2,6 +2,15 @@ import streamlit as st
 import pandas as pd
 from sqlalchemy import create_engine
 import plotly.express as px
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+# Use variables in your connection string
+db_user = os.getenv("POSTGRES_USER")
+db_pass = os.getenv("POSTGRES_PASSWORD")
+db_name = os.getenv("POSTGRES_DB")
 
 # Page Config
 st.set_page_config(page_title="Cosmic Insight Dashboard", layout="wide")
@@ -11,7 +20,7 @@ st.markdown("Real-time data orchestrated by **Apache Airflow** from **NASA's Neo
 # Database Connection
 @st.cache_data
 def get_data():
-    engine = create_engine("postgresql+psycopg2://airflow:airflow@localhost:5432/airflow")
+    engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_pass}@localhost:5432/{db_name}")
     query = "SELECT * FROM asteroids"
     return pd.read_sql(query, engine)
 
