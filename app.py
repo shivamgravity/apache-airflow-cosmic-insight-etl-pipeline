@@ -17,29 +17,32 @@ def get_data():
 try:
     df = get_data()
 
-    # Metrics Row
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Total Objects Tracked", len(df))
-    col2.metric("Hazardous Objects", len(df[df['hazard'] == True]))
-    col3.metric("Avg Velocity (km/h)", f"{int(df['velocity_kmh'].mean()):,}")
+    if not df.empty:
+        # Metrics Row
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Total Objects Tracked", len(df))
+        col2.metric("Hazardous Objects", len(df[df['hazard'] == True]))
+        col3.metric("Avg Velocity (km/h)", f"{int(df['velocity_kmh'].mean()):,}")
 
-    # Visualizations
-    st.divider()
-    left_col, right_col = st.columns(2)
+        # Visualizations
+        st.divider()
+        left_col, right_col = st.columns(2)
 
-    with left_col:
-        st.subheader("Top 10 Fastest Asteroids")
-        fast_df = df.sort_values('velocity_kmh', ascending=False).head(10)
-        st.bar_chart(data=fast_df, x='name', y='velocity_kmh', color="#FF4B4B")
+        with left_col:
+            st.subheader("Top 10 Fastest Asteroids")
+            fast_df = df.sort_values('velocity_kmh', ascending=False).head(10)
+            st.bar_chart(data=fast_df, x='name', y='velocity_kmh', color="#FF4B4B")
 
-    with right_col:
-        st.subheader("Hazard Distribution")
-        hazard_counts = df['hazard'].value_counts()
-        st.pie_chart(hazard_counts)
+        with right_col:
+            st.subheader("Hazard Distribution")
+            hazard_counts = df['hazard'].value_counts()
+            st.pie_chart(hazard_counts)
 
-    st.subheader("Raw Data Inspection")
-    st.dataframe(df, use_container_width=True)
+        st.subheader("Raw Data Inspection")
+        st.dataframe(df, use_container_width=True)
+    else:
+        st.warning("Database is connected but the 'asteroids' table is empty. Please run your Airflow DAG.")
 
 except Exception as e:
-    st.error("Waiting for data... Ensure your Airflow DAG has run and PostgreSQL is healthy.")
-    st.info("Check connection to localhost:5432")
+    st.error(f"Connection Error: {e}")
+    st.info("Ensure Docker is running and Port 5432 is exposed.")
