@@ -41,3 +41,39 @@ The pipeline follows a **Medallion (Bronze-Silver-Gold)** data architecture:
 ├── requirements.txt          # Python dependencies
 └── README.md                 # Project documentation
 ```
+
+## 5. Setup And Installation
+### Prerequisites
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running.
+* NASA API Key
+
+### Step-by-Step Deployment
+#### 1. Clone the repository
+```bash
+git clone https://github.com/shivamgravity/apache-airflow-cosmic-insight-etl-pipeline
+cd apache-airflow-cosmic-insight-etl-pipeline
+```
+
+#### 2. Initialize Environment
+Create the necessary direcotories and set the user ID to avoid permission issues.
+```bash
+mkdir -p ./dags ./logs ./plugins
+echo -e "AIRFLOW_UID=$(id -u)" > .env
+```
+
+#### 3. Initialize the Database
+```bash
+docker-compose up airflow-init
+```
+
+#### 4. Launch the Pipeline
+```bash
+docker-compose up -d
+```
+
+## 6. How to Use
+1. **Access the UI:** Open [http://localhost:8080](http://localhost:8080) in your browser.
+2. **Login:** Use username `airflow` and password `airflow`.
+3. **Activate DAG:** Locate `cosmic_insight_pipeline` in the DAGs list and toggle the "Unpause" switch.
+4. **Trigger:** Click the "Play" button on the right to manually trigger a run.
+5. **Monitor:** Check the "Graph" view to see the tasks execute in real-time.
