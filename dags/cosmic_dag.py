@@ -3,6 +3,7 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 from datetime import datetime
 import requests
 import pandas as pd
+import os
 
 @dag(
     start_date=datetime(2026, 1, 1),
